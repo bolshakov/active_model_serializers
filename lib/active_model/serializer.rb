@@ -6,7 +6,11 @@ module ActiveModel
     autoload :Configuration
     autoload :ArraySerializer
     autoload :Adapter
+    autoload :Reflection
+    autoload :Associations
     include Configuration
+    include Reflection
+    include Associations
 
     class << self
       attr_accessor :_attributes
@@ -65,50 +69,50 @@ module ActiveModel
       @_cache_options = (options.empty?) ? nil : options
     end
 
-    # Defines an association in the object should be rendered.
+    # # Defines an association in the object should be rendered.
+    # #
+    # # The serializer object should implement the association name
+    # # as a method which should return an array when invoked. If a method
+    # # with the association name does not exist, the association name is
+    # # dispatched to the serialized object.
+    # def self.has_many(*attrs)
+    #   associate(:has_many, attrs)
+    # end
     #
-    # The serializer object should implement the association name
-    # as a method which should return an array when invoked. If a method
-    # with the association name does not exist, the association name is
-    # dispatched to the serialized object.
-    def self.has_many(*attrs)
-      associate(:has_many, attrs)
-    end
-
-    # Defines an association in the object that should be rendered.
+    # # Defines an association in the object that should be rendered.
+    # #
+    # # The serializer object should implement the association name
+    # # as a method which should return an object when invoked. If a method
+    # # with the association name does not exist, the association name is
+    # # dispatched to the serialized object.
+    # def self.belongs_to(*attrs)
+    #   associate(:belongs_to, attrs)
+    # end
     #
-    # The serializer object should implement the association name
-    # as a method which should return an object when invoked. If a method
-    # with the association name does not exist, the association name is
-    # dispatched to the serialized object.
-    def self.belongs_to(*attrs)
-      associate(:belongs_to, attrs)
-    end
-
-    # Defines an association in the object should be rendered.
+    # # Defines an association in the object should be rendered.
+    # #
+    # # The serializer object should implement the association name
+    # # as a method which should return an object when invoked. If a method
+    # # with the association name does not exist, the association name is
+    # # dispatched to the serialized object.
+    # def self.has_one(*attrs)
+    #   associate(:has_one, attrs)
+    # end
     #
-    # The serializer object should implement the association name
-    # as a method which should return an object when invoked. If a method
-    # with the association name does not exist, the association name is
-    # dispatched to the serialized object.
-    def self.has_one(*attrs)
-      associate(:has_one, attrs)
-    end
-
-    def self.associate(type, attrs) #:nodoc:
-      options = attrs.extract_options!
-      self._associations = _associations.dup
-
-      attrs.each do |attr|
-        unless method_defined?(attr)
-          define_method attr do
-            object.send attr
-          end
-        end
-
-        self._associations[attr] = {type: type, association_options: options}
-      end
-    end
+    # def self.associate(type, attrs) #:nodoc:
+    #   options = attrs.extract_options!
+    #   self._associations = _associations.dup
+    #
+    #   attrs.each do |attr|
+    #     unless method_defined?(attr)
+    #       define_method attr do
+    #         object.send attr
+    #       end
+    #     end
+    #
+    #     self._associations[attr] = {type: type, association_options: options}
+    #   end
+    # end
 
     def self.url(attr)
       @_urls.push attr
